@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-r"""Convert the TTA dataset to TFRecord for object_detection.
+r"""Convert the dataset to TFRecord for object_detection.
 
 See: O. M. Parkhi, A. Vedaldi, A. Zisserman, C. V. Jawahar
      Cats and Dogs
@@ -21,7 +21,7 @@ See: O. M. Parkhi, A. Vedaldi, A. Zisserman, C. V. Jawahar
      http://www.robots.ox.ac.uk/~vgg/data/pets/
 
 Example usage:
-    python object_detection/dataset_tools/create_TTA_tf_record.py \
+    python object_detection/dataset_tools/create_tf_record.py \
         --data_dir=/home/user/pet \
         --output_dir=/home/user/pet/output
 """
@@ -45,9 +45,9 @@ from object_detection.utils import dataset_util
 from object_detection.utils import label_map_util
 
 flags = tf.app.flags
-flags.DEFINE_string('data_dir', '', 'Root directory to raw TTA dataset.')
+flags.DEFINE_string('data_dir', '', 'Root directory to raw dataset.')
 flags.DEFINE_string('output_dir', '', 'Path to directory to output TFRecords.')
-flags.DEFINE_string('label_map_path', 'data/TTA_label_map.pbtxt',
+flags.DEFINE_string('label_map_path', 'data/dataset_label_map.pbtxt',
                     'Path to label map proto')
 flags.DEFINE_integer('num_shards', 10, 'Number of TFRecord shards')
 
@@ -217,7 +217,7 @@ def main(_):
   data_dir = FLAGS.data_dir
   label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_path)
 
-  logging.info('Reading from TTA dataset.')
+  logging.info('Reading from dataset.')
   image_dir = os.path.join(data_dir, 'Train_ImageSet_datasetname')
   annotations_dir = os.path.join(data_dir, 'annotations')
   examples_path = os.path.join(annotations_dir, 'trainval.txt')
