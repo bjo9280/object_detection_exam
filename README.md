@@ -1,5 +1,9 @@
 # object_detection_exam
 
+### install
+
+<https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/installation.md> 
+
 ### prepare
 
   python -u create_tf_record_exam.py \
