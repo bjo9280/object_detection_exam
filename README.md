@@ -5,12 +5,12 @@
 <https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/installation.md> 
 
 ### prepare
-
+```bash
   python -u create_tf_record_exam.py \
     --label_map_path=label_map_exam.pbtxt \
     --data_dir=. \
     --output_dir=./tfrecords
-
+```
 
 
 ### train
