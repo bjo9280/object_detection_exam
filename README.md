@@ -5,16 +5,16 @@
 <https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/installation.md> 
 
 ### prepare
-
+```bash
   python -u create_tf_record_exam.py \
     --label_map_path=label_map_exam.pbtxt \
     --data_dir=. \
     --output_dir=./tfrecords
-
+```
 
 
 ### train
-
+```bash
 PIPELINE_CONFIG_PATH=./faster_rcnn_resnet101_datasetname.config
 MODEL_DIR=save
 NUM_TRAIN_STEPS=${1-50000}
@@ -26,9 +26,9 @@ NUM_EVAL_STEPS=2000
     --num_train_steps=${NUM_TRAIN_STEPS} \
     --num_eval_steps=${NUM_EVAL_STEPS} \
     --alsologtostderr
-
+```
 ### eval
-
+```bash
 PIPELINE_CONFIG_PATH=./faster_rcnn_resnet101_datasetname.config
 MODEL_DIR=save
 CHECKPOINT_DIR=save
@@ -39,11 +39,11 @@ CHECKPOINT=save/model.ckpt
     --model_dir=${MODEL_DIR} \
     --checkpoint_dir=${CHECKPOINT_DIR} \
     --run_once=True
-
+```
 
 
 ### export
-
+```bash
 OBJECT_DETECTION_CONFIG=./faster_rcnn_resnet101_datasetname.config
 YOUR_LOCAL_CHK_DIR=save
 YOUR_LOCAL_EXPORT_DIR=export
@@ -53,6 +53,6 @@ YOUR_LOCAL_EXPORT_DIR=export
     --pipeline_config_path ${OBJECT_DETECTION_CONFIG} \
     --trained_checkpoint_prefix ${YOUR_LOCAL_CHK_DIR}/model.ckpt-50000 \
     --output_directory ${YOUR_LOCAL_EXPORT_DIR}
-
+```
 
 
