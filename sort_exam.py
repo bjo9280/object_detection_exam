@@ -91,6 +91,7 @@ def inference_frames(path_to_graph, path_to_labels,
                     if scores[i] < threshold:
                         continue
 
+
                     # Create the detection bounding box row
                     pre_track_data.append({
                         "frame_id": file_name.split(".")[0],
@@ -104,9 +105,11 @@ def inference_frames(path_to_graph, path_to_labels,
 
                 prog = '\rCompleted %.2f %%' % (100 * float((int(file_name.split(".")[0]) - min_index) / num_frames))
                 print('{}'.format(prog), end="")
+    print('\rCompleted %.2f %%' % (100.00))
+    print(counter)
+    pre_track_data = pd.DataFrame(pre_track_data)
+    return pre_track_data
 
-
-from sort import *
 
 
 def calculate_tracks_mot(bboxes_inf):
@@ -143,6 +146,66 @@ def calculate_tracks_mot(bboxes_inf):
 
     return pd.DataFrame(tracks)
 
-raw_detections = inference_frames(PATH_TO_INFERENCE_GRAPH, '', PATH_TO_DATA, 0, 100, 0.5)
+
+def get_RGB(n):
+    max_value = 16581375 #255**3
+    interval = int(max_value / n)
+    colors = [hex(I)[2:].zfill(6) for I in range(0, max_value, interval)]
+    return [(int(i[:2], 16), int(i[2:4], 16), int(i[4:], 16)) for i in colors]
+
+
+def create_video_from_results(video_path, image_folder, input_frames, min_index, max_index, bounding_boxes):
+    frame_count = 1
+
+    data_folder = image_folder
+
+    image = cv2.imread(join(data_folder, '{}.jpg'.format(min_index)))
+    size = image.shape[1], image.shape[0]
+
+    fourcc = cv2.VideoWriter_fourcc('X', 'V', 'I', 'D')
+    # fourcc = cv2.VideoWriter_fourcc('H', '2', '6', '4')
+
+    out_vid = cv2.VideoWriter(video_path, fourcc, 10.0, size)
+
+    track_data = {}
+
+    # get unique color for each track_id
+    uniques = bounding_boxes.track_id.unique()
+    rand_colors = get_RGB(len(uniques))
+    colors = {}
+    for i, t in enumerate(uniques):
+        colors.update({t: rand_colors[i]})
+
+    list = [i for i in range(min_index, max_index)]
+    # unique_frames = input_frames.frame_no.unique()
+    unique_frames = np.array(list)
+
+    frames_len = len(unique_frames)
+
+    for fdx_1, frame_1 in enumerate(unique_frames):
+        print("\rsaving frame no:{}, out of {}".format(frame_count, frames_len), end='')
+
+        image = cv2.imread(join(data_folder, '{}.jpg'.format(frame_1)))
+
+        items = bounding_boxes[bounding_boxes.apply(lambda x: int(x['frame_id']) == frame_1, axis=1)]
+        for fdx_2, frame_2 in items.iterrows():
+            xmin, ymin, xmax, ymax = frame_2.box[0], frame_2.box[1], frame_2.box[2], frame_2.box[3]
+            track_id = frame_2.track_id
+
+            cv2.rectangle(image, (int(xmin), int(ymin)), (int(xmax), int(ymax)), colors[track_id], 2)
+
+        out_vid.write(image)
+        frame_count += 1
+
+    out_vid.release()
+
+    print('\nCompleted!')
+
+# detect_frames(PATH_TO_INFERENCE_GRAPH, PATH_TO_LABELS, PATH_TO_DATA, VIDEO_OUT_PATH,0, 1467, 5, 0.5, ANNOTATION_PATH)
+
+raw_detections = inference_frames(PATH_TO_INFERENCE_GRAPH, '', PATH_TO_DATA, 755, 955, 0.5)
 tracks = calculate_tracks_mot(raw_detections)
-tracks.head()
+print(tracks.head())
+
+create_video_from_results(VIDEO_OUT_PATH, PATH_TO_DATA, '', 755, 955 ,tracks)
+# disp_video(VIDEO_OUT_PATH)
